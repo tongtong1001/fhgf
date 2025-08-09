@@ -2,33 +2,31 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>你好</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简洁网页</title>
     <style>
         * {
             box-sizing: border-box;
         }
-        , { 
-            宽度：100% ！重要;
-            高度：100% ！重要;
-            边距：0 ！重要;
-             
-            溢出：隐藏 ！重要;
-            背景颜色： #000;
+        html, body {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
         }
         
-        #内容框架 {
-            位置：绝对;
-            顶部：0;
-            左：0;
-            宽度：100%;
+        #contentFrame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
             margin: 0 !important;
             padding: 0 !important;
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
-            background-color: #000;
             overflow: hidden;
         }
         
@@ -38,23 +36,19 @@
             align-items: center;
             width: 100%;
             height: 100%;
-            background: #000;
         }
         
         .error-content {
-            color: #fff;
             text-align: center;
             max-width: 90%;
             padding: 20px;
             border-radius: 8px;
-            background: rgba(50, 50, 50, 0.8);
             font-family: Arial, sans-serif;
         }
         
         .error-detail {
             font-size: 14px;
             margin-top: 15px;
-            color: #aaa;
             word-break: break-all;
         }
         
@@ -158,41 +152,10 @@
             }
         });
 
-        // 防止多点触控缩放
-        document.addEventListener('touchstart', function(e) {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        });
-
         // 页面加载完成后初始化
         window.addEventListener('DOMContentLoaded', function() {
             init();
             console.log('Host page loaded');
-            
-            // 3秒后检查加载状态
-            setTimeout(function() {
-                const frame = document.getElementById('contentFrame');
-                if (frame && frame.style.display === 'block' && 
-                   (!frame.contentDocument || frame.contentDocument.readyState !== 'complete')) {
-                    console.warn('Frame not loaded after timeout');
-                    const warning = document.createElement('div');
-                    warning.textContent = '...';
-                    warning.style.position = 'fixed';
-                    warning.style.bottom = '10px';
-                    warning.style.left = '10px';
-                    warning.style.color = '#fff';
-                    warning.style.background = 'rgba(0,0,0,0.7)';
-                    warning.style.padding = '5px 10px';
-                    warning.style.borderRadius = '4px';
-                    warning.style.fontSize = '12px';
-                    document.body.appendChild(warning);
-                }
-            }, 3000);
         });
     </script>
 </head>
