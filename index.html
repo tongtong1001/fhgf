@@ -2,181 +2,104 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简洁网页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>欢迎</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        /* 彻底去除所有元素的内外边距 */
         html, body {
             width: 100% !important;
             height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
             overflow: hidden !important;
+            background-color: #000; /* 防止加载时出现白边 */
         }
         
+        /* 绝对全屏iframe */
         #contentFrame {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             margin: 0 !important;
             padding: 0 !important;
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
+            background-color: #000;
             overflow: hidden;
         }
-        
-        .error-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .error-content {
-            text-align: center;
-            max-width: 90%;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: Arial, sans-serif;
-        }
-        
-        .error-detail {
-            font-size: 14px;
-            margin-top: 15px;
-            word-break: break-all;
-        }
-        
+
+        /* 特殊设备兼容处理 */
         @media screen and (max-width: 600px) {
             html, body {
                 -webkit-touch-callout: none;
                 -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
                 -ms-user-select: none;
                 user-select: none;
             }
         }
     </style>
     <script>
-        // 转义HTML特殊字符的函数
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return unsafe.toString()
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+        // 函数用于获取 URL 参数
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
-        // 初始化函数
-        function init() {
-            // 获取URL参数
-            const params = new URLSearchParams(window.location.search);
-            const pathParam = params.get('p');
+        // 获取并解码 URL 参数
+        window.onload = function() {
+            const base64Url = getQueryParam('u'); // 获取名为u的参数
+            let targetUrl = 'about:blank'; // 默认安全页面
             
-            let targetUrl = 'about:blank';
-            let errorMessage = null;
-            
-            // 处理路径参数
-            if (pathParam) {
+            if (base64Url) {
                 try {
-                    // 编码参数并构建URL
-                    const encodedParam = encodeURIComponent(pathParam);
-                    const fullUrl = `https://vip.fmkefu.com/c/${encodedParam}`;
-                    
-                    // URL格式验证
-                    if (fullUrl.match(/^https?:\/\/[^\s/$.?#].[^\s]*$/i)) {
-                        targetUrl = fullUrl;
-                    } else {
-                        throw new Error('无效的固定链接格式');
-                    }
+                    targetUrl = atob(base64Url); // Base64解码
                 } catch (e) {
-                    errorMessage = '链接生成错误: ' + e.message;
-                    console.error('[ERROR]', errorMessage, '输入:', pathParam);
+                    console.error('URL解码错误:', e);
+                    document.body.innerHTML = '<div style="color:#fff;text-align:center;padding-top:50px;background:#000;">URL格式错误</div>';
+                    return;
                 }
-            } else {
-                errorMessage = '缺少路径参数 "p"';
-                console.error('[ERROR]', errorMessage);
             }
-            
-            // 显示错误信息或设置iframe
-            if (errorMessage) {
-                const errorContainer = document.getElementById('errorContainer');
-                errorContainer.style.display = 'flex';
-                document.getElementById('errorText').innerHTML = escapeHtml(errorMessage);
-                document.getElementById('errorDetail').textContent = pathParam ? 
-                    `参数值: ${escapeHtml(pathParam)}` : 
-                    '请提供有效的URL参数';
-            } else {
-                const frame = document.getElementById('contentFrame');
-                frame.src = targetUrl;
-                frame.style.display = 'block';
-                initFrame();
-            }
-        }
 
-        // 初始化iframe
-        function initFrame() {
+            // 设置 iframe 的 src 属性为目标 URL
             const frame = document.getElementById('contentFrame');
-            if (!frame) return;
+            frame.src = targetUrl;
             
-            // 设置大小
-            frame.width = window.innerWidth;
-            frame.height = window.innerHeight;
-            
-            // 加载事件
-            frame.addEventListener('load', function() {
-                console.log('Frame content loaded');
-            });
-            
-            // 错误事件
-            frame.addEventListener('error', function(err) {
-                console.error('Frame load error', err);
-                document.getElementById('errorContainer').style.display = 'flex';
-                document.getElementById('errorText').textContent = '页面加载失败';
-                document.getElementById('errorDetail').textContent = '目标网站阻止了加载请求';
-            });
-        }
-
-        // 窗口大小调整
+            // 主动调整iframe尺寸
+            frame.style.width = window.innerWidth + 'px';
+            frame.style.height = window.innerHeight + 'px';
+        };
+        
+        // 窗口大小变化时动态调整
         window.addEventListener('resize', function() {
             const frame = document.getElementById('contentFrame');
-            if (frame) {
-                frame.style.width = window.innerWidth + 'px';
-                frame.style.height = window.innerHeight + 'px';
-            }
+            frame.style.width = window.innerWidth + 'px';
+            frame.style.height = window.innerHeight + 'px';
         });
+        
+        // 阻止所有可能的手势操作导致的缩放
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
-        // 页面加载完成后初始化
-        window.addEventListener('DOMContentLoaded', function() {
-            init();
-            console.log('Host page loaded');
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
         });
     </script>
 </head>
 <body>
-    <!-- 错误信息容器 (默认隐藏) -->
-    <div id="errorContainer" class="error-container" style="display: none;">
-        <div class="error-content">
-            <h3>配置错误</h3>
-            <p id="errorText"></p>
-            <div id="errorDetail" class="error-detail"></div>
-        </div>
-    </div>
-    
-    <!-- 内容框架 (默认隐藏) -->
     <iframe 
-        id="contentFrame"
+        id="contentFrame" 
         frameborder="0"
         scrolling="yes"
-        allow="fullscreen"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"
         allowfullscreen
-        style="display:none;"></iframe>
+        sandbox="allow-same-origin allow-scripts"
+        style="display:block;"></iframe>
 </body>
 </html>
